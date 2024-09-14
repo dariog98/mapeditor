@@ -1,0 +1,133 @@
+* {
+  font-family: 'Courier Prime';
+}
+
+body {
+  background-color: black;
+  color: white;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.btn-system {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: #6c757d;
+  --bs-btn-border-color: #6c757d;
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #0b5ed7;
+  --bs-btn-hover-border-color: #0a58ca;
+  --bs-btn-focus-shadow-rgb: 130, 138, 145;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #0a58ca;
+  --bs-btn-active-border-color: #0a53be;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: #6c757d;
+  --bs-btn-disabled-border-color: #6c757d;
+  opacity: var(--bs-btn-disabled-opacity);
+}
+
+.btn-system:hover {
+  opacity: 1;
+}
+
+.btn-system:active, .btn-system.active {
+  opacity: 1 !important;
+}
+
+.button-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  color: #fff;
+  background-color: #80808050;
+  border-radius: 0.375rem;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  opacity: 0.65;
+  border: 0;
+}
+
+.button-card:hover {
+  background-color: #0b5ed7;
+  opacity: 1;
+}
+
+.member-avatar-min {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.member-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  user-drag: none;
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.member-card {
+  background-color: #80808050;
+  border-radius: 0.375rem;
+  min-width: 170px;
+  min-height: 66px;
+}
+
+.member-card:nth-child(2n+2) {
+  background-color: #50505050;
+  border-radius: 0.375rem;
+}
+
+.member-card-gold {
+  background-color: #e6c43f8f !important;
+  background-color: #f0f0f050 !important;
+}
+
+.member-card-teamA {
+  background-color: #00ffdb50;
+  border-radius: 0.375rem;
+}
+
+.member-card-teamA:nth-child(2n+2) {
+  background-color: #0090db50;
+  border-radius: 0.375rem;
+}
+
+.member-card-teamB {
+  background-color: #ff000050;
+  border-radius: 0.375rem;
+}
+
+.member-card-teamB:nth-child(2n+2) {
+  background-color: #90000050;
+  border-radius: 0.375rem;
+}
+
+.tile {
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.tiles-panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+}
