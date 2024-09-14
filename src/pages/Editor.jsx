@@ -15,6 +15,8 @@ const Editor = () => {
                 handleScaleUp={editor.handleScaleUp}
                 handleScaleDown={editor.handleScaleDown}
                 handleSaveMap={editor.handleSaveMap}
+                showGridBorders={editor.showGridBorders}
+                handleShowGridBorders={editor.toggleShowGridBorders}
             />
 
             <Canvas 
@@ -22,7 +24,7 @@ const Editor = () => {
                 stageId={editor.currentStage}
                 tileset={editor.getCurrentTileset()}
                 scale={editor.scale}
-                seeBorder={true}
+                showGridBorders={editor.showGridBorders}
                 currentLayer={editor.currentLayer}
                 handleToolAction={editor.handleToolAction}
             />

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useRef } from 'react'
 
-const Canvas = ({ map, stageId, tileset, scale, seeBorder, currentLayer, handleToolAction }) => {
+const Canvas = ({ map, stageId, tileset, scale, showGridBorders, currentLayer, handleToolAction }) => {
     const canvasRef = useRef()
     const containerRef = useRef()
 
@@ -50,7 +50,7 @@ const Canvas = ({ map, stageId, tileset, scale, seeBorder, currentLayer, handleT
                 })))
 
                 // Draw Grid
-                if (seeBorder) {
+                if (showGridBorders) {
                     context.globalCompositeOperation = 'source-over'
                     context.strokeStyle = '#ffffff25'
                     for (let y = 0; y < stage.gridSize.height; y++) {
@@ -63,7 +63,7 @@ const Canvas = ({ map, stageId, tileset, scale, seeBorder, currentLayer, handleT
                 }
             }
         }
-    }, [map, scale, stageId, currentLayer])
+    }, [map, scale, stageId, currentLayer, showGridBorders])
 
     return (
         <div ref={containerRef} className='border w-100 h-100 overflow-hidden' onClick={handleOnClick}>
