@@ -4,6 +4,7 @@ import { TILESETS } from '../constants/tilesets'
 
 const useEditor = () => {
     const [scale, setScale] = useState(1)
+    const [showGridBorders, setShowGridBorders] = useState(true)
     const [currentLayer, setCurrentLayer] = useState(0)
     const [currentStage, setCurrentStage] = useState(undefined)
     const [currentTool, setCurrentTool] = useState('pencil')
@@ -54,6 +55,10 @@ const useEditor = () => {
         URL.revokeObjectURL(link.href)
     }
 
+    const toggleShowGridBorders = () => {
+        setShowGridBorders(current => !current)
+    }
+
     return {
         scale,
         handleScaleUp,
@@ -73,7 +78,9 @@ const useEditor = () => {
         getCurrentStage,
         getCurrentTileset,
         handleToolAction,
-        handleSaveMap
+        handleSaveMap,
+        showGridBorders,
+        toggleShowGridBorders,
     }
 }
 

@@ -1,10 +1,10 @@
-import { faPen, faEraser, faFillDrip, faFloppyDisk, faMagnifyingGlassPlus, faMagnifyingGlassMinus } from '@fortawesome/free-solid-svg-icons'
+import { faBorderAll, faPen, faEraser, faFillDrip, faFloppyDisk, faMagnifyingGlassPlus, faMagnifyingGlassMinus } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '../basics'
 import { TOOLS } from '../../constants/tools'
 
 const BUTTON_STYLE = { width: '2.5rem', height: '2.5rem'}
 
-const ToolsPanel = ({ currentTool, handleSetTool, handleScaleUp, handleScaleDown, handleSaveMap }) => {
+const ToolsPanel = ({ currentTool, handleSetTool, handleScaleUp, handleScaleDown, handleSaveMap, showGridBorders, handleShowGridBorders }) => {
     return (
         <div className='d-flex flex-column gap-3'>
             <Button
@@ -27,6 +27,14 @@ const ToolsPanel = ({ currentTool, handleSetTool, handleScaleUp, handleScaleDown
                 icon={faFillDrip}
                 isActived={currentTool == TOOLS.Bucket}
                 handleOnClick={() => handleSetTool(TOOLS.Bucket)}
+            />
+
+            <Button
+                className='btn-outline-light'
+                style={BUTTON_STYLE}
+                icon={faBorderAll}
+                isActived={showGridBorders}
+                handleOnClick={handleShowGridBorders}
             />
 
             <hr/>

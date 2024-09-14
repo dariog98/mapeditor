@@ -2,7 +2,7 @@
 
 Tilemap editor for 2D games written in React.js
 
-![UI-editor](https://raw.githubusercontent.com/dariog98/school/main/resources/UI-editor.png)
+![UI-editor](https://raw.githubusercontent.com/dariog98/mapeditor/main/resources/UI-editor.png)
 
 ## Project Overview
 
