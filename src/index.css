@@ -131,3 +131,14 @@ body {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.5rem;
 }
+
+.icon-button {
+  color: #404040;
+  color: #ffffffAA;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  color:white;
+  opacity: 1;
+}

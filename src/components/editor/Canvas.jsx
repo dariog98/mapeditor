@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useRef } from 'react'
+import { LAYER_TYPES } from '../../constants/tools'
 
 const Canvas = ({ map, stageId, tileset, scale, showGridBorders, currentLayer, handleToolAction }) => {
     const canvasRef = useRef()
@@ -12,7 +13,7 @@ const Canvas = ({ map, stageId, tileset, scale, showGridBorders, currentLayer, h
         handleToolAction(pointerX, pointerY)
     }
 
-    useEffect(() => {
+    const handleReDraw = () => {
         const context = canvasRef.current.getContext('2d')
 
         context.canvas.width  = containerRef.current.offsetWidth
@@ -28,11 +29,12 @@ const Canvas = ({ map, stageId, tileset, scale, showGridBorders, currentLayer, h
             const sprite = new Image()
             sprite.src = tileset.texture
             sprite.onload = function() {
+                // Draw tiles
                 stage.layers.map((layer, l) => layer.map((row, y) => row.map((tileId, x) => {
                     const tile = tileset.tiles[tileId]
 
                     if (tile) {
-                        if (l !== currentLayer) {
+                        if (currentLayer.type == LAYER_TYPES.Tile && currentLayer.index !== l) {
                             context.globalCompositeOperation = 'multiply'
                             context.fillStyle = '#ffffff90'
                         } else {
@@ -49,21 +51,61 @@ const Canvas = ({ map, stageId, tileset, scale, showGridBorders, currentLayer, h
                     }
                 })))
 
+                // Draw Collisions
+                if (currentLayer.type == LAYER_TYPES.Collision) {
+                    const collisions = stage.collisions[currentLayer.index]
+                    context.globalCompositeOperation = 'source-over'
+                    context.fillStyle = '#ff0000A0'
+
+                    for (let y = 0; y < stage.gridSize.height; y++) {
+                        for (let x = 0; x < stage.gridSize.width; x++) {
+                            if (collisions[y][x] === 1) {
+                                context.fillRect(
+                                    x * tileset.tileSize.width * scale,
+                                    y * tileset.tileSize.height * scale,
+                                    tileset.tileSize.width * scale,
+                                    tileset.tileSize.height * scale
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Draw Grid
                 if (showGridBorders) {
                     context.globalCompositeOperation = 'source-over'
                     context.strokeStyle = '#ffffff25'
+                    
                     for (let y = 0; y < stage.gridSize.height; y++) {
                         for (let x = 0; x < stage.gridSize.width; x++) {
-                            context.beginPath()
-                            context.rect(x * tileset.tileSize.width * scale, y * tileset.tileSize.height * scale, tileset.tileSize.width * scale, tileset.tileSize.height * scale);
-                            context.stroke()
+                            context.strokeRect(
+                                x * tileset.tileSize.width * scale,
+                                y * tileset.tileSize.height * scale,
+                                tileset.tileSize.width * scale,
+                                tileset.tileSize.height * scale
+                            )
                         }
                     }
                 }
             }
         }
+    }
+
+    useEffect(() => {
+        handleReDraw()
     }, [map, scale, stageId, currentLayer, showGridBorders])
+
+    /*
+    useEffect(() => {
+        const canvas = canvasRef.current
+
+        canvas.addEventListener('click', () => {
+            handleReDraw()
+        })
+
+        handleReDraw()
+    }, [])
+    */
 
     return (
         <div ref={containerRef} className='border w-100 h-100 overflow-hidden' onClick={handleOnClick}>

@@ -26,7 +26,7 @@ const TileButton = ({ tileset, tileId, isActive, handleOnClick }) => {
 
 const TilesPanel = ({ tileset, currentTile, handleSetTile }) => {
     return (
-        <div className='overflow-auto' style={{ width: '16rem' }}>
+        <div className='overflow-auto' style={{ width: '300px' }}>
             <div className='tiles-panel'>
                 {
                     Object.keys(tileset.tiles).map(tileId =>

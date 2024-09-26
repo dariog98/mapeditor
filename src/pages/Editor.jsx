@@ -33,7 +33,7 @@ const Editor = () => {
                 tileset={editor.getCurrentTileset()}
                 currentTile={editor.currentTile}
                 handleSetTile={editor.handleSetTile}
-                />
+            />
 
             <Layers
                 map={editor.map}
@@ -41,6 +41,8 @@ const Editor = () => {
                 currentLayer={editor.currentLayer}
                 handleSetStageLayer={editor.handleSetStageLayer}
                 handleModalStageOpen={modalStage.handleOpen}
+                handleDeleteStage={editor.handleDeleteStage}
+                handleAddLayer={editor.handleAddLayer}
             />
 
             <ModalStage

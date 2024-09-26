@@ -25,6 +25,7 @@ const ModalStage = ({ showModal, handleClose, form, isLoading }) => {
                         before='Width'
                         name='width'
                         type='number'
+                        placeholder='0'
                     />
 
                     <Input
@@ -32,6 +33,7 @@ const ModalStage = ({ showModal, handleClose, form, isLoading }) => {
                         before='Height'
                         name='height'
                         type='number'
+                        placeholder='0'
                     />
                 </div>
 
