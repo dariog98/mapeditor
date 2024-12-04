@@ -1,5 +1,10 @@
 import * as yup from 'yup'
 
+const schemaMap = yup.object({
+    id: yup.string().required(),
+    title: yup.string().required(),
+})
+
 const schemaStage = yup.object({
     id: yup.string().required(),
     title: yup.string().required(),
@@ -8,5 +13,6 @@ const schemaStage = yup.object({
 })
 
 export {
+    schemaMap,
     schemaStage
 }

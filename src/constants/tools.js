@@ -1,7 +1,8 @@
 const TOOLS = {
     Pencil: 'pencil',
     Bucket: 'bucket',
-    Eraser: 'eraser'
+    Eraser: 'eraser',
+    Offset: 'offset',
 }
 
 const EMPTY_TILE = '****'

@@ -8,18 +8,12 @@ import CollisionLayers from './CollisionLayers'
 const Layers = ({ map, currentStage, currentLayer, handleModalStageOpen, handleSetStageLayer, handleDeleteStage, handleAddLayer }) => {
     return (
         <div className='d-flex flex-column gap-3 overflow-auto' style={{ minWidth: '300px' }}>
+            {/*
             <div className='user-select-none d-flex align-items-center gap-2'>
                 <FontAwesomeIcon icon={faMap}/>
                 {map?.id}
             </div>
-
-            <Button
-                className='btn-primary'
-                icon={faPlus}
-                text='Add Stage'
-                handleOnClick={handleModalStageOpen}
-            />
-
+            */}
             <div className='d-flex flex-column gap-3'>
                 {
                     map?.stages &&
@@ -62,6 +56,14 @@ const Layers = ({ map, currentStage, currentLayer, handleModalStageOpen, handleS
                     })
                 }
             </div>
+
+            <Button
+                className='btn-primary'
+                icon={faPlus}
+                text='Add Stage'
+                handleOnClick={handleModalStageOpen}
+            />
+
         </div>
     )
 }

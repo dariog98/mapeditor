@@ -10,12 +10,14 @@ const TileButton = ({ tileset, tileId, isActive, handleOnClick }) => {
             const context = canvasRef.current.getContext('2d')
             const image = new Image()
             image.onload = function() {
+                context.canvas.width  = canvasRef.current.offsetWidth
+                context.canvas.height = canvasRef.current.offsetHeight
                 context.imageSmoothingEnabled = false
                 context.drawImage(image, data.x, data.y, data.width, data.height, 0, 0, canvasRef.current.width, canvasRef.current.height)
             }
             image.src = tileset?.texture
         }
-    }, [tileId])
+    }, [tileset, tileId])
 
     return <div>
         <div className='border overflow-hidden' onClick={handleOnClick} style={{ width: '3rem', height: '3rem', imageRendering: 'pixelated', opacity: isActive ? 1 : 0.5 }}>

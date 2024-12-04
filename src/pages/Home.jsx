@@ -1,11 +1,13 @@
 import { faFileCirclePlus, faFilePen } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '../components/basics'
 import { useRef } from 'react'
-import { useFile } from '../hooks'
+import { useFile, useModalMap } from '../hooks'
+import { ModalMap } from '../components/home'
 
 const Home = ({ handleCurrentTab }) => {
     const { handleLoadFile } = useFile({ handleCurrentTab })
     const hiddenInputFile = useRef()
+    const modal = useModalMap({ handleCurrentTab })
 
     const handleLoadMapButton = () => {
         hiddenInputFile.current.click()
@@ -20,6 +22,7 @@ const Home = ({ handleCurrentTab }) => {
                     className='btn-primary'
                     icon={faFileCirclePlus}
                     text='New map'
+                    handleOnClick={modal.handleOpen}
                 />
 
                 <Button
@@ -31,6 +34,8 @@ const Home = ({ handleCurrentTab }) => {
 
                 <input className='d-none' type='file' ref={hiddenInputFile} accept='.json' onChange={handleLoadFile}/>
             </div>
+
+            <ModalMap showModal={modal.show} form={modal.form} handleClose={modal.handleClose}/>
         </div>
     )
 }

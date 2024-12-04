@@ -1,4 +1,4 @@
-import { faCircleChevronDown, faCircleChevronUp, faPlus, faLayerGroup, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCircleChevronDown, faCircleChevronUp, faPlus, faEye, faEyeSlash, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { LAYER_TYPES } from '../../constants/tools'
 
@@ -15,7 +15,7 @@ const TileLayers = ({ layers, stageId, currentLayer, currentStage, handleSetStag
             </div>
             {
                 layers?.length > 0 &&
-                layers.map((_, layerIndex) => {
+                layers.map((layer, layerIndex) => {
                     const isActive = stageId == currentStage && currentLayer.type == LAYER_TYPES.Tile && currentLayer.index == layerIndex
                     return (
                         <div
@@ -26,7 +26,7 @@ const TileLayers = ({ layers, stageId, currentLayer, currentStage, handleSetStag
                                 className='flex-grow-1 d-flex align-items-center gap-2 cursor-pointer'
                                 onClick={() => handleSetStageLayer(stageId, LAYER_TYPES.Tile, layerIndex)}
                             >
-                                <FontAwesomeIcon icon={faLayerGroup}/>
+                                <FontAwesomeIcon icon={layer.isEnabled ? faEye : faEyeSlash}/>
                                 <div className='user-select-none'>{layerIndex}</div>
                             </div>
                             <div className='d-flex gap-3'>

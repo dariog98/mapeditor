@@ -10,6 +10,7 @@ const useEditor = () => {
     const [currentStage, setCurrentStage] = useState(undefined)
     const [currentTool, setCurrentTool] = useState(TOOLS.Pencil)
     const [currentTile, setCurrentTile] = useState('0000')
+    const [offset, setOffset] = useState({ x: 0, y: 0 })
     const { map, createNewMap, addNewStage, deleteStage, handleSetTiles, addNewLayer } = useMap()
 
     const TOOL_ACTIONS = {
@@ -20,9 +21,9 @@ const useEditor = () => {
                 handleSetTiles(stageId, layer, [ tile ], value)
             }
         },
-        [TOOLS.Bucket]: (stageId, layerIndex, originTile, value) => {
+        [TOOLS.Bucket]: (stageId, layer, originTile, value) => {
             const stage = map.stages[stageId]
-            const currentTileValue = stage.layers[layerIndex][originTile.y][originTile.x]
+            const currentTileValue = stage.layers[layer.index].grid[originTile.y][originTile.x]
             const checked = Array.from(Array(stage.gridSize.height), () => Array(stage.gridSize.width).fill(false))
             const tiles = []
 
@@ -37,7 +38,7 @@ const useEditor = () => {
 
                 checked[tile.y][tile.x] = true
 
-                if (stage.layers[layerIndex][tile.y][tile.x] === currentTileValue) {
+                if (stage.layers[layer.index].grid[tile.y][tile.x] === currentTileValue) {
                     tiles.push(tile)
                     dfs({ x: tile.x, y: tile.y - 1 })
                     dfs({ x: tile.x, y: tile.y + 1 })
@@ -47,7 +48,7 @@ const useEditor = () => {
             }
 
             dfs(originTile)
-            handleSetTiles(stageId, layerIndex, tiles, value)        
+            handleSetTiles(stageId, layer, tiles, value)        
         },
         [TOOLS.Eraser]: (stageId, layer, tile) => {
             if (layer.type == LAYER_TYPES.Collision) {
@@ -55,6 +56,9 @@ const useEditor = () => {
             } else {
                 handleSetTiles(stageId, layer, [ tile ], EMPTY_TILE)
             }
+        },
+        [TOOLS.Offset]: (stageId, layer, tile, tileValue, position) => {
+            console.log(position)
         },
     }
 
@@ -86,9 +90,9 @@ const useEditor = () => {
 
     const handleToolAction = (pointerX, pointerY) => {
         const tileset = getCurrentTileset()
-        const x = Math.floor(pointerX / (tileset.tileSize.width * scale))
-        const y = Math.floor(pointerY / (tileset.tileSize.width * scale))
-        TOOL_ACTIONS[currentTool](currentStage, currentLayer, { x, y }, currentTile)
+        const x = Math.floor((pointerX + offset.x) / (tileset.tileSize.width * scale))
+        const y = Math.floor((pointerY + offset.y) / (tileset.tileSize.width * scale))
+        TOOL_ACTIONS[currentTool](currentStage, currentLayer, { x, y }, currentTile, { x: pointerX, y: pointerY })
     }
 
     const handleSaveMap = () => {
@@ -130,6 +134,8 @@ const useEditor = () => {
         handleDeleteStage: deleteStage,
         handleSetTiles,
         handleAddLayer: addNewLayer,
+        offset,
+        handleOffset: setOffset,
     }
 }
 
