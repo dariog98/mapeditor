@@ -1,15 +1,66 @@
 import { useState } from 'react'
-import useMap from './useMap'
 import { TILESETS } from '../constants/tilesets'
+import { EMPTY_TILE, LAYER_TYPES, TOOLS } from '../constants/tools'
+import useMap from './useMap'
 
 const useEditor = () => {
     const [scale, setScale] = useState(1)
     const [showGridBorders, setShowGridBorders] = useState(true)
-    const [currentLayer, setCurrentLayer] = useState(0)
+    const [currentLayer, setCurrentLayer] = useState({})
     const [currentStage, setCurrentStage] = useState(undefined)
-    const [currentTool, setCurrentTool] = useState('pencil')
+    const [currentTool, setCurrentTool] = useState(TOOLS.Pencil)
     const [currentTile, setCurrentTile] = useState('0000')
-    const { map, createNewMap, addNewStage, handleSetTiles } = useMap()
+    const [offset, setOffset] = useState({ x: 0, y: 0 })
+    const { map, createNewMap, addNewStage, deleteStage, handleSetTiles, addNewLayer } = useMap()
+
+    const TOOL_ACTIONS = {
+        [TOOLS.Pencil]: (stageId, layer, tile, value) => {
+            if (layer.type == LAYER_TYPES.Collision) {
+                handleSetTiles(stageId, layer, [ tile ], 1)
+            } else {
+                handleSetTiles(stageId, layer, [ tile ], value)
+            }
+        },
+        [TOOLS.Bucket]: (stageId, layer, originTile, value) => {
+            const stage = map.stages[stageId]
+            const currentTileValue = stage.layers[layer.index].grid[originTile.y][originTile.x]
+            const checked = Array.from(Array(stage.gridSize.height), () => Array(stage.gridSize.width).fill(false))
+            const tiles = []
+
+            const dfs = (tile) => {
+                if (
+                    !(tile.y >= 0 && tile.y <= stage.gridSize.height - 1) ||
+                    !(tile.x >= 0 && tile.x <= stage.gridSize.width - 1) ||
+                    checked[tile.y][tile.x]
+                ) {
+                    return
+                }
+
+                checked[tile.y][tile.x] = true
+
+                if (stage.layers[layer.index].grid[tile.y][tile.x] === currentTileValue) {
+                    tiles.push(tile)
+                    dfs({ x: tile.x, y: tile.y - 1 })
+                    dfs({ x: tile.x, y: tile.y + 1 })
+                    dfs({ x: tile.x - 1, y: tile.y })
+                    dfs({ x: tile.x + 1, y: tile.y })
+                }
+            }
+
+            dfs(originTile)
+            handleSetTiles(stageId, layer, tiles, value)        
+        },
+        [TOOLS.Eraser]: (stageId, layer, tile) => {
+            if (layer.type == LAYER_TYPES.Collision) {
+                handleSetTiles(stageId, layer, [ tile ], 0)
+            } else {
+                handleSetTiles(stageId, layer, [ tile ], EMPTY_TILE)
+            }
+        },
+        [TOOLS.Offset]: (stageId, layer, tile, tileValue, position) => {
+            console.log(position)
+        },
+    }
 
     const handleSetTool = (toolId) => {
         setCurrentTool(toolId)
@@ -23,9 +74,9 @@ const useEditor = () => {
         setScale(current => Math.max(current - 1, 1))
     }
 
-    const handleSetStageLayer = (stageId, indexLayer) => {
+    const handleSetStageLayer = (stageId, typeLayer, indexLayer) => {
         setCurrentStage(stageId)
-        setCurrentLayer(indexLayer)
+        setCurrentLayer({ type: typeLayer, index: indexLayer })
     }
 
     const getCurrentStage = () => {
@@ -39,9 +90,9 @@ const useEditor = () => {
 
     const handleToolAction = (pointerX, pointerY) => {
         const tileset = getCurrentTileset()
-        const x = Math.floor(pointerX / (tileset.tileSize.width * scale))
-        const y = Math.floor(pointerY / (tileset.tileSize.width * scale))
-        handleSetTiles(currentStage, currentLayer, [ { x, y } ], currentTile)
+        const x = Math.floor((pointerX + offset.x) / (tileset.tileSize.width * scale))
+        const y = Math.floor((pointerY + offset.y) / (tileset.tileSize.width * scale))
+        TOOL_ACTIONS[currentTool](currentStage, currentLayer, { x, y }, currentTile, { x: pointerX, y: pointerY })
     }
 
     const handleSaveMap = () => {
@@ -71,16 +122,20 @@ const useEditor = () => {
         handleSetStage: setCurrentStage,
         currentLayer,
         handleSetStageLayer,
-        map,
-        createNewMap,
-        addNewStage,
-        handleSetTiles,
         getCurrentStage,
         getCurrentTileset,
         handleToolAction,
         handleSaveMap,
         showGridBorders,
         toggleShowGridBorders,
+        map,
+        createNewMap,
+        addNewStage,
+        handleDeleteStage: deleteStage,
+        handleSetTiles,
+        handleAddLayer: addNewLayer,
+        offset,
+        handleOffset: setOffset,
     }
 }
 

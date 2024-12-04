@@ -1,19 +1,19 @@
-const Input = ({ label, before, after, form, name, type, placeholder, isDisabled, isReadOnly, value, handleOnChange }) => {
+const Select = ({ label, before, after, form, name, options, isDisabled, isReadOnly, defaultValue, handleOnChange }) => {
     return (
         <div>
             {label && <label className='form-label'>{label}</label>}
             <div className='input-group'>
                 {before && <div className='input-group-text'>{before}</div>}
-                <input
-                    className={`form-control ${type == 'color' ? 'form-control-color' : ''}${form?.formState.errors[name] ? 'is-invalid' : ''}`}
-                    type={type}
-                    placeholder={placeholder}
+                <select
+                    className='form-select'
                     disabled={isDisabled}
                     readOnly={isReadOnly}
-                    value={value}
                     { ...form?.register(name) }
+                    defaultValue={defaultValue}
                     onChange={handleOnChange}
-                />
+                >
+                    {options.map((option, index) => <option key={index} value={option.value}>{option.label}</option>)}
+                </select>
                 {after && <div className='input-group-text'>{after}</div>}
             </div>
             <div>
@@ -26,4 +26,4 @@ const Input = ({ label, before, after, form, name, type, placeholder, isDisabled
     )
 }
 
-export default Input
+export default Select
