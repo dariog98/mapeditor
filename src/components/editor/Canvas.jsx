@@ -1,39 +1,41 @@
-import { useEffect } from 'react'
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LAYER_TYPES } from '../../constants/tools'
 import { ENTITIES } from '../../constants/tilesets'
 
 const Canvas = ({ map, stageId, tileset, scale, offset, showGridBorders, currentLayer, handleToolAction, handleOffset }) => {
     const canvasRef = useRef()
     const containerRef = useRef()
-
-    const handleOnClick = (event) => {
-        const rect = containerRef.current.getBoundingClientRect()
-        const pointerX = event.clientX - rect.left
-        const pointerY = event.clientY - rect.top
-        handleToolAction(pointerX, pointerY)
-    }
+    const [startPoint, setStartPoint] = useState()
+    //const [endPoint, setEndPoint] = useState()
+    const [isDrawing, setIsDrawing] = useState(false)
 
     const handleOnMouseDown = (event) => {
-        const starPoint = { x: event.clientX, y: event.clientY }
+        event.stopPropagation()
+        const rect = containerRef.current.getBoundingClientRect()
+        const eventPosition = { x: event.clientX, y: event.clientY }
+        const canvasPosition = { x: event.clientX - rect.left, y: event.clientY - rect.top }
+        setStartPoint(canvasPosition)
+        setIsDrawing(true)
+    }
 
-        const onMove = (event) => {
-            const endPoint = { x: event.clientX, y: event.clientY }
-            const newOffset = {
-                x: offset.x + starPoint.x - endPoint.x,
-                y: offset.y + starPoint.y - endPoint.y
-            }
+    const handleOnMouseUp = (event) => {
+        //event.stopPropagation()
+        //const rect = containerRef.current.getBoundingClientRect()
+        //const x = event.clientX - rect.left
+        //const y = event.clientY - rect.top
+        setIsDrawing(false)
+        //console.log(startPoint, { x, y })
+        ////handleToolAction(startPoint, { x, y })
+    }
 
-            handleOffset(newOffset)
+    const handleOnMouseMove = (event) => {
+        event.stopPropagation()
+        if (isDrawing) {
+            const rect = containerRef.current.getBoundingClientRect()
+            const eventPosition = { x: event.clientX, y: event.clientY }
+            const canvasPosition = { x: event.clientX - rect.left, y: event.clientY - rect.top }
+            handleToolAction(startPoint, canvasPosition)
         }
-
-        const onUp = () => {
-            containerRef.current.removeEventListener('mousemove', onMove)
-            containerRef.current.removeEventListener('mouseup', onUp)
-        }
-
-        containerRef.current.addEventListener('mousemove', onMove)
-        containerRef.current.addEventListener('mouseup', onUp)
     }
 
     const handleReDraw = async () => {
@@ -45,6 +47,14 @@ const Canvas = ({ map, stageId, tileset, scale, offset, showGridBorders, current
             texture.src = tileset.texture
             await texture.decode()
 
+            const entities = new Image()
+            const data = ENTITIES[map.stages[stageId].tilesetId]
+
+            if (data) {
+                entities.src = data?.texture
+                await entities.decode()    
+            }
+
             context.canvas.width  = containerRef.current.offsetWidth
             context.canvas.height = containerRef.current.offsetHeight
 
@@ -54,22 +64,22 @@ const Canvas = ({ map, stageId, tileset, scale, offset, showGridBorders, current
             context.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
             // Draw Layers
-            stage.layers.map((layer, l) => {
+            stage.layers.map((layer, layerIndex) => {
                 if (!layer.isEnabled) return
+                if (currentLayer.type == LAYER_TYPES.Tile && layerIndex > currentLayer.index) return
 
-                if (currentLayer.type == LAYER_TYPES.Tile && l > currentLayer.index) return
+                if (currentLayer.type == LAYER_TYPES.Tile && currentLayer.index !== layerIndex) {
+                    context.globalCompositeOperation = 'multiply'
+                    context.fillStyle = '#ffffff90'
+                } else {
+                    context.globalCompositeOperation = 'source-over'
+                }
 
+                // Draw Layer
                 layer.grid.map((row, y) => row.map((tileId, x) => {
                     const tile = tileset.tiles[tileId]
 
                     if (tile) {
-                        if (currentLayer.type == LAYER_TYPES.Tile && currentLayer.index !== l) {
-                            context.globalCompositeOperation = 'multiply'
-                            context.fillStyle = '#ffffff90'
-                        } else {
-                            context.globalCompositeOperation = 'source-over'
-                        }
-                        
                         context.drawImage(
                             texture,
                             tile.x, tile.y,
@@ -79,6 +89,18 @@ const Canvas = ({ map, stageId, tileset, scale, offset, showGridBorders, current
                         )
                     }
                 }))
+
+                // Draw entities
+                stage.entities.filter(entity => entity.layer === layerIndex).map(entity => {
+                    const data =  ENTITIES[map.stages[stageId].tilesetId].entities[entity.entityId]
+                    context.drawImage(
+                        entities,
+                        data.position.x, data.position.y,
+                        data.size.width, data.size.height,
+                        (entity.position.x - data.offset.x) * scale, (entity.position.y - data.offset.y) * scale,
+                        data.size.width * scale, data.size.height * scale,
+                    )
+                })
             })
 
             // Draw Collisions
@@ -124,20 +146,14 @@ const Canvas = ({ map, stageId, tileset, scale, offset, showGridBorders, current
         handleReDraw()
     }, [map, scale, stageId, currentLayer, showGridBorders, offset])
 
-    /*
-    useEffect(() => {
-        const canvas = canvasRef.current
-
-        canvas.addEventListener('click', () => {
-            handleReDraw()
-        })
-
-        handleReDraw()
-    }, [])
-    */
-
     return (
-        <div ref={containerRef} className='border w-100 h-100 overflow-hidden' onClick={handleOnClick} onMouseDown={handleOnMouseDown}>
+        <div
+            className='border w-100 h-100 overflow-hidden'
+            ref={containerRef}
+            onMouseDown={handleOnMouseDown}
+            onMouseUp={handleOnMouseUp}
+            onMouseMove={handleOnMouseMove}
+        >
             <canvas ref={canvasRef} style={{ width: '100%', imageRendering: 'pixelated', pointerEvents: 'none' }}/>
         </div>
     )

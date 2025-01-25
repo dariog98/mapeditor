@@ -4,40 +4,15 @@ import { EMPTY_TILE, LAYER_TYPES } from '../constants/tools'
 const useMap = () => {
     const [data, setData] = useState(undefined)
 
-    const handleSetTiles = (stageId, layer, tiles, value) => {
-        const layers = data.stages[stageId].layers//.map(row => row.map(tileId => tileId))
-        const collisions = data.stages[stageId].collisions//.map(row => row.map(tileId => tileId))
-
-        tiles.forEach(tile => {
-            if (
-                (tile.y >= 0 && tile.y <= data.stages[stageId].gridSize.height - 1) &&
-                (tile.x >= 0 && tile.x <= data.stages[stageId].gridSize.width - 1)
-            ) {
-                if (layer.type == LAYER_TYPES.Collision) {
-                    collisions[layer.index][tile.y][tile.x] = value
-                } else {
-                    layers[layer.index].grid[tile.y][tile.x] = value
-                }
-            }
-        })
-
-        setData(current => {
-            const temp = { ...current }
-            temp.stages[stageId].layers = layers
-            temp.stages[stageId].collisions = collisions
-            return temp
-        })
-    }
-
     const createNewMap = (mapId, title) => {
         setData({
             id: mapId,
-            title,
+            title: title,
             stages: {}
         })
     }
 
-    const addNewStage = (stageId, title, backgroundColor, gridWidth, gridHeight, tilesetId, player, layers, collisions, triggers, entities) => {
+    const addNewStage = (stageId, title, backgroundColor, gridWidth, gridHeight, tilesetId, playerDefaults, layers, collisions, triggers, entities) => {
         const id = stageId
 
         setData(current => {
@@ -45,7 +20,7 @@ const useMap = () => {
                 id: stageId,
                 title,
                 backgroundColor,
-                player,
+                playerDefaults,
                 gridSize: { width: gridWidth, height: gridHeight },
                 tilesetId,
                 triggers: triggers ?? [],
@@ -89,6 +64,31 @@ const useMap = () => {
             current.stages[id] = stage
 
             return current
+        })
+    }
+
+    const handleSetTiles = (stageId, layer, tiles, value) => {
+        const layers = data.stages[stageId].layers
+        const collisions = data.stages[stageId].collisions
+
+        tiles.forEach(tile => {
+            if (
+                (tile.y >= 0 && tile.y <= data.stages[stageId].gridSize.height - 1) &&
+                (tile.x >= 0 && tile.x <= data.stages[stageId].gridSize.width - 1)
+            ) {
+                if (layer.type == LAYER_TYPES.Collision) {
+                    collisions[layer.index][tile.y][tile.x] = value
+                } else {
+                    layers[layer.index].grid[tile.y][tile.x] = value
+                }
+            }
+        })
+
+        setData(current => {
+            const temp = { ...current }
+            temp.stages[stageId].layers = layers
+            temp.stages[stageId].collisions = collisions
+            return temp
         })
     }
 

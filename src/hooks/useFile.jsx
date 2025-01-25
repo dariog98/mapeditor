@@ -19,7 +19,7 @@ const useFile = ({ handleCurrentTab }) => {
                 const data = JSON.parse(text)
                 editor.createNewMap(data?.id ?? 'unknown')
                 Object.keys(data.stages).map(stageId => {
-                    const { title, backgroundColor, gridSize, tilesetId, player, layers, collisions, triggers, entities } = data.stages[stageId]
+                    const { title, backgroundColor, gridSize, tilesetId, playerDefaults, layers, collisions, triggers, entities } = data.stages[stageId]
                     editor.addNewStage(
                         stageId,
                         title,
@@ -27,7 +27,7 @@ const useFile = ({ handleCurrentTab }) => {
                         gridSize.width,
                         gridSize.height,
                         tilesetId,
-                        player,
+                        playerDefaults,
                         layers,
                         collisions,
                         triggers,

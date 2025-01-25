@@ -14,52 +14,61 @@ const useEditor = () => {
     const { map, createNewMap, addNewStage, deleteStage, handleSetTiles, addNewLayer } = useMap()
 
     const TOOL_ACTIONS = {
-        [TOOLS.Pencil]: (stageId, layer, tile, value) => {
-            if (layer.type == LAYER_TYPES.Collision) {
-                handleSetTiles(stageId, layer, [ tile ], 1)
-            } else {
-                handleSetTiles(stageId, layer, [ tile ], value)
-            }
-        },
-        [TOOLS.Bucket]: (stageId, layer, originTile, value) => {
-            const stage = map.stages[stageId]
-            const currentTileValue = stage.layers[layer.index].grid[originTile.y][originTile.x]
-            const checked = Array.from(Array(stage.gridSize.height), () => Array(stage.gridSize.width).fill(false))
+        [TOOLS.Pencil]: (stageId, layer, tileValue, startPoint, endPoint) => {
             const tiles = []
+            const startTile = getPositionInCanvas(startPoint)
+            const endTile = getPositionInCanvas(endPoint)
 
-            const dfs = (tile) => {
-                if (
-                    !(tile.y >= 0 && tile.y <= stage.gridSize.height - 1) ||
-                    !(tile.x >= 0 && tile.x <= stage.gridSize.width - 1) ||
-                    checked[tile.y][tile.x]
-                ) {
-                    return
-                }
+            const minX = Math.min(startTile.x, endTile.x)
+            const maxX = Math.max(startTile.x, endTile.x)
+            const minY = Math.min(startTile.y, endTile.y)
+            const maxY = Math.max(startTile.y, endTile.y)
 
-                checked[tile.y][tile.x] = true
-
-                if (stage.layers[layer.index].grid[tile.y][tile.x] === currentTileValue) {
-                    tiles.push(tile)
-                    dfs({ x: tile.x, y: tile.y - 1 })
-                    dfs({ x: tile.x, y: tile.y + 1 })
-                    dfs({ x: tile.x - 1, y: tile.y })
-                    dfs({ x: tile.x + 1, y: tile.y })
+            for (let y = minY; y <= maxY; y++) {
+                for (let x = minX; x <= maxX; x++) {
+                    tiles.push({ x, y })
                 }
             }
 
-            dfs(originTile)
-            handleSetTiles(stageId, layer, tiles, value)        
-        },
-        [TOOLS.Eraser]: (stageId, layer, tile) => {
             if (layer.type == LAYER_TYPES.Collision) {
-                handleSetTiles(stageId, layer, [ tile ], 0)
+                handleSetTiles(stageId, layer, tiles, 1)
             } else {
-                handleSetTiles(stageId, layer, [ tile ], EMPTY_TILE)
+                handleSetTiles(stageId, layer, tiles, tileValue)
             }
         },
-        [TOOLS.Offset]: (stageId, layer, tile, tileValue, position) => {
-            console.log(position)
+        [TOOLS.Eraser]: (stageId, layer, tileValue, startPoint, endPoint) => {
+            const tiles = []
+            const startTile = getPositionInCanvas(startPoint)
+            const endTile = getPositionInCanvas(endPoint)
+
+            const minX = Math.min(startTile.x, endTile.x)
+            const maxX = Math.max(startTile.x, endTile.x)
+            const minY = Math.min(startTile.y, endTile.y)
+            const maxY = Math.max(startTile.y, endTile.y)
+
+            for (let y = minY; y <= maxY; y++) {
+                for (let x = minX; x <= maxX; x++) {
+                    tiles.push({ x, y })
+                }
+            }
+
+            if (layer.type == LAYER_TYPES.Collision) {
+                handleSetTiles(stageId, layer, tiles, 0)
+            } else {
+                handleSetTiles(stageId, layer, tiles, EMPTY_TILE)
+            }
         },
+        [TOOLS.Offset]: (stageId, layer, tileValue, startPoint, endPoint) => {
+            const difference = {
+                x: startPoint.x - endPoint.x,
+                y: startPoint.y - endPoint.y
+            }
+            const newOffset = {
+                x: difference.x,
+                y: difference.y
+            }
+            setOffset(newOffset)
+        }
     }
 
     const handleSetTool = (toolId) => {
@@ -88,11 +97,24 @@ const useEditor = () => {
         return TILESETS[stage?.tilesetId ?? 'vampire']
     }
 
-    const handleToolAction = (pointerX, pointerY) => {
+    const handleToolAction = (startPoint, endPoint) => {
+        const toolFunction = TOOL_ACTIONS[currentTool]
+        toolFunction(
+            currentStage,
+            currentLayer,
+            currentTile,
+            startPoint,
+            endPoint,
+        )
+    }
+
+    const getPositionInCanvas = (point) => {
         const tileset = getCurrentTileset()
-        const x = Math.floor((pointerX + offset.x) / (tileset.tileSize.width * scale))
-        const y = Math.floor((pointerY + offset.y) / (tileset.tileSize.width * scale))
-        TOOL_ACTIONS[currentTool](currentStage, currentLayer, { x, y }, currentTile, { x: pointerX, y: pointerY })
+        const position = {
+            x: Math.floor((point.x + offset.x) / (tileset.tileSize.width * scale)),
+            y: Math.floor((point.y + offset.y) / (tileset.tileSize.width * scale)),
+        }
+        return position
     }
 
     const handleSaveMap = () => {

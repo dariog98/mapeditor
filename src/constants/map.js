@@ -1,6 +1,34 @@
 import { EMPTY_TILE } from './tools'
 
-class Layer {
+class LayerCollision {
+    constructor(width, height, grid, isEnabled) {
+        this.isEnabled = isEnabled ?? true
+        this.grid = Array.from(Array(height), () => new Array(width).fill(0))
+
+        if (grid) {
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const collision = grid?.[y]?.[x] ?? 0
+                    this.grid[y][x] = collision
+                }
+            }
+        }
+    }
+
+    toggleEnabled() {
+        this.isEnabled = !this.isEnabled
+    }
+
+    disable() {
+        this.isEnabled = false
+    }
+
+    enable() {
+        this.isEnabled = true
+    }
+}
+
+class LayerTile {
     constructor(width, height, grid, isEnabled) {
         this.isEnabled = isEnabled ?? true
         this.grid = Array.from(Array(height), () => new Array(width).fill(EMPTY_TILE))
@@ -18,6 +46,14 @@ class Layer {
     toggleEnabled() {
         this.isEnabled = !this.isEnabled
     }
+
+    disable() {
+        this.isEnabled = false
+    }
+
+    enable() {
+        this.isEnabled = true
+    }
 }
 
 class Stage {
@@ -34,21 +70,38 @@ class Stage {
         this.collisions = []
     }
 
-    addLayer(grid, isEnabled) {
-        const newLayer = new Layer(this.gridSize.width, this.gridSize.height, grid, isEnabled)
+    addLayerTile(grid, isEnabled) {
+        const newLayer = new LayerTile(this.gridSize.width, this.gridSize.height, grid, isEnabled)
         this.layers.push(newLayer)
     }
 
-    removeLayer(layerIndex) {
+    removeLayerTile(layerIndex) {
         this.layers.splice(layerIndex, 1)
     }
 
-    updateLayer(layerIndex, x, y, value) {
+    updateLayerTile(layerIndex, x, y, value) {
         this.layers[layerIndex][y][x] = value
     }
 
     getLayerTileValue(layerIndex, x, y) {
         return this.layers[layerIndex][y][x]
+    }
+
+    addLayerCollision(grid, isEnabled) {
+        const newLayer = new LayerCollision(this.gridSize.width, this.gridSize.height, grid, isEnabled)
+        this.collisions.push(newLayer)
+    }
+
+    updateLayerCollision(layerIndex, x, y, value) {
+        this.collisions[layerIndex][y][x] = value
+    }
+
+    removeLayerCollision(layerIndex) {
+        this.collisions.splice(layerIndex, 1)
+    }
+
+    getLayerCollisionValue(layerIndex, x, y) {
+        return this.collisions[layerIndex][y][x]
     }
 }
 
@@ -65,6 +118,10 @@ class Map {
 
     removeStage(stageId) {
         this.stages[stageId] = undefined
+    }
+
+    getStage(stageId) {
+        return this.stages[stageId]
     }
 }
 

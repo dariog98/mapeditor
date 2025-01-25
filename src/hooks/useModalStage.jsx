@@ -12,8 +12,8 @@ const useModalStage = ({ handleAddStage }) => {
 
     const handleConfirm = async (data) => {
         const { id, title, backgroundColor, width, height, tilesetId, layers, collisions, triggers, playerX, playerY, playerLayer } = data
-        const player = { position: { x: playerX ?? 0, y: playerY ?? 0 }, layer: playerLayer ?? 1 }
-        handleAddStage(id, title, backgroundColor, Number(width), Number(height), tilesetId, player, layers, collisions, triggers)
+        const playerDefaults = { position: { x: playerX ?? 0, y: playerY ?? 0 }, layer: playerLayer ?? 1 }
+        handleAddStage(id, title, backgroundColor, Number(width), Number(height), tilesetId, playerDefaults, layers, collisions, triggers)
         handleClose()
     }
 
@@ -29,9 +29,9 @@ const useModalStage = ({ handleAddStage }) => {
             layers: stage?.layers,
             collisions: stage?.collisions,
             triggers: stage?.triggers,
-            playerX: stage?.player?.position?.x,
-            playerY: stage?.player?.position?.y,
-            playerLayer: stage?.player?.layer,
+            playerX: stage?.playerDefaults?.position?.x,
+            playerY: stage?.playerDefaults?.position?.y,
+            playerLayer: stage?.playerDefaults?.layer,
         })
         handleOpenModal()
     }
